@@ -3,6 +3,7 @@ import 'dart:async';
 
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:sqlite/DatabaseHelper.dart';
 
 import 'Todo.dart';
 
@@ -12,7 +13,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Your favorite note app',
+      title: 'Your favorite todo app',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
@@ -28,7 +29,6 @@ class HomeScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text('Create a todo'),
       ),
-      // Create the SelectionButton widget in the next step.
       body: Column(
         children: <Widget>[
           Center(child: CreateTodoButton()),
@@ -46,9 +46,8 @@ class ReadTodoScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text('Saved Todos'),
       ),
-      // Create the SelectionButton widget in the next step.
       body: FutureBuilder<List<Todo>>(
-        future: retrieveTodo(),
+        future: DatabaseHelper().retrieveTodos(),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             return ListView.builder(
@@ -87,36 +86,6 @@ class ReadTodoButton extends StatelessWidget {
       MaterialPageRoute(builder: (context) => ReadTodoScreen()),
     );
   }
-}
-
-Future<List<Todo>> retrieveTodo() async {
-  // A method that retrieves all the dogs from the dogs table.
-  // Get a reference to the database.
-  Future<Database> database = await getDatabaseName();
-  // Get a reference to the database.
-  final Database db = await database;
-
-  // Query the table for all The Dogs.
-  final List<Map<String, dynamic>> maps = await db.query('todos');
-
-  // Convert the List<Map<String, dynamic> into a List<Dog>.
-  return List.generate(maps.length, (i) {
-    return Todo(
-      id: maps[i]['id'],
-      title: maps[i]['title'],
-      content: maps[i]['content'],
-    );
-  });
-}
-
-getDatabaseName() async {
-  final databaseName = 'todos_database.db';
-  final Future<Database> database = openDatabase(
-      join(await getDatabasesPath(), databaseName), onCreate: (db, version) {
-    return db.execute(
-        "CREATE TABLE todos(id INTEGER PRIMARY KEY, title TEXT, content TEXT)");
-  }, version: 1);
-  return database;
 }
 
 class CreateTodoButton extends StatelessWidget {
@@ -196,37 +165,11 @@ class _CreateTodoState extends State<CreateTodoScreen> {
       floatingActionButton: FloatingActionButton(
           child: Icon(Icons.check),
           onPressed: () {
-            storeTodo(titleTextController.text, descriptionTextController.text);
+            DatabaseHelper().insertTodo(Todo(
+                title: titleTextController.text,
+                content: descriptionTextController.text));
             Navigator.pop(context, "Nota guardada con exito");
           }),
     );
-  }
-
-  Future storeTodo(String title, String description) async {
-    insertTodo(Todo(title: title, content: description));
-  }
-
-  Future<void> insertTodo(Todo todo) async {
-    Future<Database> database = await getDatabaseName();
-    final Database db = await database;
-
-    await db.insert(
-      todo.tableName,
-      todo.toMap(),
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
-
-    final List<Map<String, dynamic>> maps = await db.query(todo.tableName);
-
-    var list = List.generate(maps.length, (i) {
-      return Todo(
-        id: maps[i]['id'],
-        title: maps[i]['title'],
-        content: maps[i]['content'],
-      );
-    });
-    list.forEach((e) {
-      print(e.content);
-    });
   }
 }
