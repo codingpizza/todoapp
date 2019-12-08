@@ -1,7 +1,7 @@
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
-import 'Todo.dart';
+import '../model/Todo.dart';
 
 class DatabaseHelper {
   Future<Database> database = initializeDatabase();
@@ -19,28 +19,15 @@ class DatabaseHelper {
   Future<void> insertTodo(Todo todo) async {
     final Database db = await database;
 
-    await db.insert(Todo.tableName(), todo.toMap(),
+    await db.insert(Todo.TABLENAME, todo.toMap(),
         conflictAlgorithm: ConflictAlgorithm.replace);
-
-    final List<Map<String, dynamic>> maps = await db.query(Todo.tableName());
-
-    var list = List.generate(maps.length, (i) {
-      return Todo(
-        id: maps[i]['id'],
-        title: maps[i]['title'],
-        content: maps[i]['content'],
-      );
-    });
-    list.forEach((e) {
-      print(e.content);
-    });
   }
 
   Future<List<Todo>> retrieveTodos() async {
     final Database db = await database;
 
     // Query the table for all The Dogs.
-    final List<Map<String, dynamic>> maps = await db.query(Todo.tableName());
+    final List<Map<String, dynamic>> maps = await db.query(Todo.TABLENAME);
 
     // Convert the List<Map<String, dynamic> into a List<Dog>.
     return List.generate(maps.length, (i) {
