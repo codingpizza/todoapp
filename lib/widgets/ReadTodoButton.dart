@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'ReadTodoScreen.dart';
+import '../screens/ReadTodoScreen.dart';
 
 class ReadTodoButton extends StatelessWidget {
   @override

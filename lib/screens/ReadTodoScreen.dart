@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sqlite/model/Todo.dart';
-
+import 'package:sqlite/screens/CreateTodoScreen.dart';
 import '../helper/DatabaseHelper.dart';
 
 class ReadTodoScreen extends StatelessWidget {
@@ -20,6 +20,12 @@ class ReadTodoScreen extends StatelessWidget {
                 return ListTile(
                   title: Text(snapshot.data[index].title),
                   subtitle: Text(snapshot.data[index].content),
+                  onTap: () => _navigateToDetail(context, snapshot.data[index]),
+                  trailing: IconButton(
+                      alignment: Alignment.center,
+                      icon: Icon(Icons.delete),
+                      onPressed: () =>
+                          {print("Todo: This should delete the item")}),
                 );
               },
             );
@@ -31,4 +37,11 @@ class ReadTodoScreen extends StatelessWidget {
       ),
     );
   }
+}
+
+_navigateToDetail(BuildContext context, Todo todo) async {
+  Navigator.push(
+    context,
+    MaterialPageRoute(builder: (context) => DetailTodoScreen(todo: todo)),
+  );
 }
