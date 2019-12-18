@@ -11,7 +11,7 @@ class ReadTodoScreen extends StatelessWidget {
         title: Text('Saved Todos'),
       ),
       body: FutureBuilder<List<Todo>>(
-        future: DatabaseHelper().retrieveTodos(),
+        future: DatabaseHelper.databaseHelper.retrieveTodos(),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             return ListView.builder(
@@ -19,13 +19,13 @@ class ReadTodoScreen extends StatelessWidget {
               itemBuilder: (BuildContext context, int index) {
                 return ListTile(
                   title: Text(snapshot.data[index].title),
+                  leading: Text(snapshot.data[index].id.toString()),
                   subtitle: Text(snapshot.data[index].content),
                   onTap: () => _navigateToDetail(context, snapshot.data[index]),
                   trailing: IconButton(
                       alignment: Alignment.center,
                       icon: Icon(Icons.delete),
-                      onPressed: () =>
-                          {print("Todo: This should delete the item")}),
+                      onPressed: () => _deleteTodo(snapshot.data[index])),
                 );
               },
             );
@@ -37,6 +37,11 @@ class ReadTodoScreen extends StatelessWidget {
       ),
     );
   }
+}
+
+_deleteTodo(Todo todo) {
+  DatabaseHelper.databaseHelper.deleteTodo(todo.id);
+  //TODO: Pendiente de actualizar la vista
 }
 
 _navigateToDetail(BuildContext context, Todo todo) async {

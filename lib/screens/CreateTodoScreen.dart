@@ -68,13 +68,15 @@ class _CreateTodoState extends State<DetailTodoScreen> {
     );
   }
 
-  _saveTodo() {
+  _saveTodo() async {
     if (todo == null) {
-      DatabaseHelper().insertTodo(Todo(
+      DatabaseHelper.databaseHelper.insertTodo(Todo(
           title: titleTextController.text,
           content: descriptionTextController.text));
       Navigator.pop(context, "Your todo has been saved.");
     } else {
+      var test = await DatabaseHelper.databaseHelper.updateTodo(todo);
+      print(test.toString());
       Navigator.pop(context);
     }
   }

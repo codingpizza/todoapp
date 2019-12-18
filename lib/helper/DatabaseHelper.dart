@@ -4,27 +4,37 @@ import 'package:sqflite/sqflite.dart';
 import '../model/Todo.dart';
 
 class DatabaseHelper {
-  Future<Database> database = initializeDatabase();
-  static const databaseName = 'todos_database.db';
+  //Create a private constructor
+  DatabaseHelper._();
 
-  static Future<Database> initializeDatabase() async {
-    final Future<Database> database = openDatabase(
-        join(await getDatabasesPath(), databaseName), onCreate: (db, version) {
-      return db.execute(
-          "CREATE TABLE todos(id INTEGER PRIMARY KEY, title TEXT, content TEXT)");
-    }, version: 1);
-    return database;
+  static const databaseName = 'todos_database.db';
+  static final DatabaseHelper databaseHelper = DatabaseHelper._();
+  static Database _database;
+
+  Future<Database> get database async {
+    if (_database == null) {
+      return await initializeDatabase();
+    }
+    return _database;
   }
 
-  Future<void> insertTodo(Todo todo) async {
-    final Database db = await database;
+  initializeDatabase() async {
+    return await openDatabase(join(await getDatabasesPath(), databaseName),
+        version: 1, onCreate: (Database db, int version) async {
+      await db.execute(
+          "CREATE TABLE todos(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, title TEXT, content TEXT)");
+    });
+  }
 
-    await db.insert(Todo.TABLENAME, todo.toMap(),
+  insertTodo(Todo todo) async {
+    final db = await database;
+    var res = await db.insert(Todo.TABLENAME, todo.toMap(),
         conflictAlgorithm: ConflictAlgorithm.replace);
+    return res;
   }
 
   Future<List<Todo>> retrieveTodos() async {
-    final Database db = await database;
+    final db = await database;
 
     final List<Map<String, dynamic>> maps = await db.query(Todo.TABLENAME);
 
@@ -35,5 +45,20 @@ class DatabaseHelper {
         content: maps[i]['content'],
       );
     });
+  }
+
+  Future<int> updateTodo(Todo todo) async {
+    var db = await this.database;
+
+    var result = await db.update(Todo.TABLENAME, todo.toMap(),
+        where: 'id = ?',
+        whereArgs: [todo.id],
+        conflictAlgorithm: ConflictAlgorithm.replace);
+    return result;
+  }
+
+  Future<void> deleteTodo(int id) async {
+    var db = await this.database;
+    return db.delete(Todo.TABLENAME, where: 'id = ?', whereArgs: [id]);
   }
 }
