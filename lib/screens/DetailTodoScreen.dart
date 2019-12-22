@@ -64,19 +64,23 @@ class _CreateTodoState extends State<DetailTodoScreen> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-          child: Icon(Icons.check), onPressed: () => _saveTodo()),
+          child: Icon(Icons.check),
+          onPressed: () async {
+            _saveTodo(titleTextController.text, descriptionTextController.text);
+            setState(() {});
+          }),
     );
   }
 
-  _saveTodo() async {
+  _saveTodo(String title, String content) async {
     if (todo == null) {
-      DatabaseHelper.databaseHelper.insertTodo(Todo(
+      DatabaseHelper.instance.insertTodo(Todo(
           title: titleTextController.text,
           content: descriptionTextController.text));
       Navigator.pop(context, "Your todo has been saved.");
     } else {
-      var test = await DatabaseHelper.databaseHelper.updateTodo(todo);
-      print(test.toString());
+      await DatabaseHelper.instance
+          .updateTodo(Todo(id: todo.id, title: title, content: content));
       Navigator.pop(context);
     }
   }

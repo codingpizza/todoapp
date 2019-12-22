@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:sqlite/model/Todo.dart';
-import 'package:sqlite/screens/CreateTodoScreen.dart';
+import 'package:sqlite/screens/DetailTodoScreen.dart';
 import '../helper/DatabaseHelper.dart';
 
-class ReadTodoScreen extends StatelessWidget {
+class ReadTodoScreen extends StatefulWidget {
+  @override
+  _ReadTodoScreenState createState() => _ReadTodoScreenState();
+}
+
+class _ReadTodoScreenState extends State<ReadTodoScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -11,7 +16,7 @@ class ReadTodoScreen extends StatelessWidget {
         title: Text('Saved Todos'),
       ),
       body: FutureBuilder<List<Todo>>(
-        future: DatabaseHelper.databaseHelper.retrieveTodos(),
+        future: DatabaseHelper.instance.retrieveTodos(),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             return ListView.builder(
@@ -25,14 +30,17 @@ class ReadTodoScreen extends StatelessWidget {
                   trailing: IconButton(
                       alignment: Alignment.center,
                       icon: Icon(Icons.delete),
-                      onPressed: () => _deleteTodo(snapshot.data[index])),
+                      onPressed: () async {
+                        _deleteTodo(snapshot.data[index]);
+                        setState(() {});
+                      }),
                 );
               },
             );
           } else if (snapshot.hasError) {
             return Text("Oops!");
           }
-          return CircularProgressIndicator();
+          return Center(child: CircularProgressIndicator());
         },
       ),
     );
@@ -40,8 +48,7 @@ class ReadTodoScreen extends StatelessWidget {
 }
 
 _deleteTodo(Todo todo) {
-  DatabaseHelper.databaseHelper.deleteTodo(todo.id);
-  //TODO: Pendiente de actualizar la vista
+  DatabaseHelper.instance.deleteTodo(todo.id);
 }
 
 _navigateToDetail(BuildContext context, Todo todo) async {

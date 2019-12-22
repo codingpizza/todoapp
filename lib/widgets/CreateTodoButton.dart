@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../screens/CreateTodoScreen.dart';
+import '../screens/DetailTodoScreen.dart';
 
 class CreateTodoButton extends StatelessWidget {
   @override

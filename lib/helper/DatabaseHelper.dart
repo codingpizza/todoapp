@@ -8,7 +8,7 @@ class DatabaseHelper {
   DatabaseHelper._();
 
   static const databaseName = 'todos_database.db';
-  static final DatabaseHelper databaseHelper = DatabaseHelper._();
+  static final DatabaseHelper instance = DatabaseHelper._();
   static Database _database;
 
   Future<Database> get database async {
@@ -47,8 +47,8 @@ class DatabaseHelper {
     });
   }
 
-  Future<int> updateTodo(Todo todo) async {
-    var db = await this.database;
+  Future<void> updateTodo(Todo todo) async {
+    final db = await this.database;
 
     var result = await db.update(Todo.TABLENAME, todo.toMap(),
         where: 'id = ?',
