@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'CreateTodoScreen.dart';
+import '../screens/DetailTodoScreen.dart';
 
 class CreateTodoButton extends StatelessWidget {
   @override
@@ -20,7 +20,7 @@ class CreateTodoButton extends StatelessWidget {
     final result = await Navigator.push(
       context,
       // Create the SelectionScreen in the next step.
-      MaterialPageRoute(builder: (context) => CreateTodoScreen()),
+      MaterialPageRoute(builder: (context) => DetailTodoScreen()),
     );
     Scaffold.of(context)
       ..removeCurrentSnackBar()

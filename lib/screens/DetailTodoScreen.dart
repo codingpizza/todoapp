@@ -1,20 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:sqlite/model/Todo.dart';
-
 import '../helper/DatabaseHelper.dart';
 
-class CreateTodoScreen extends StatefulWidget {
-  static const routeName = '/createTodoScreen';
+class DetailTodoScreen extends StatefulWidget {
+  static const routeName = '/detailTodoScreen';
+  final Todo todo;
+
+  const DetailTodoScreen({Key key, this.todo}) : super(key: key);
 
   @override
-  State<StatefulWidget> createState() {
-    return _CreateTodoState();
-  }
+  State<StatefulWidget> createState() => _CreateTodoState(todo);
 }
 
-class _CreateTodoState extends State<CreateTodoScreen> {
+class _CreateTodoState extends State<DetailTodoScreen> {
+  Todo todo;
   final descriptionTextController = TextEditingController();
   final titleTextController = TextEditingController();
+
+  _CreateTodoState(this.todo);
+
+  @override
+  void initState() {
+    super.initState();
+    if (todo != null) {
+      descriptionTextController.text = todo.content;
+      titleTextController.text = todo.title;
+    }
+  }
 
   @override
   void dispose() {
@@ -53,12 +65,23 @@ class _CreateTodoState extends State<CreateTodoScreen> {
       ),
       floatingActionButton: FloatingActionButton(
           child: Icon(Icons.check),
-          onPressed: () {
-            DatabaseHelper().insertTodo(Todo(
-                title: titleTextController.text,
-                content: descriptionTextController.text));
-            Navigator.pop(context, "Your todo has been saved.");
+          onPressed: () async {
+            _saveTodo(titleTextController.text, descriptionTextController.text);
+            setState(() {});
           }),
     );
+  }
+
+  _saveTodo(String title, String content) async {
+    if (todo == null) {
+      DatabaseHelper.instance.insertTodo(Todo(
+          title: titleTextController.text,
+          content: descriptionTextController.text));
+      Navigator.pop(context, "Your todo has been saved.");
+    } else {
+      await DatabaseHelper.instance
+          .updateTodo(Todo(id: todo.id, title: title, content: content));
+      Navigator.pop(context);
+    }
   }
 }
