@@ -47,18 +47,17 @@ class DatabaseHelper {
     });
   }
 
-  Future<void> updateTodo(Todo todo) async {
-    final db = await this.database;
+  updateTodo(Todo todo) async {
+    final db = await database;
 
-    var result = await db.update(Todo.TABLENAME, todo.toMap(),
+    await db.update(Todo.TABLENAME, todo.toMap(),
         where: 'id = ?',
         whereArgs: [todo.id],
         conflictAlgorithm: ConflictAlgorithm.replace);
-    return result;
   }
 
-  Future<void> deleteTodo(int id) async {
-    var db = await this.database;
-    return db.delete(Todo.TABLENAME, where: 'id = ?', whereArgs: [id]);
+  deleteTodo(int id) async {
+    var db = await database;
+    db.delete(Todo.TABLENAME, where: 'id = ?', whereArgs: [id]);
   }
 }

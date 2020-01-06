@@ -3,7 +3,7 @@ import 'package:sqlite/model/Todo.dart';
 import 'package:sqlite/screens/DetailTodoScreen.dart';
 import '../helper/DatabaseHelper.dart';
 
-class ReadTodoScreen extends StatefulWidget {
+class  ReadTodoScreen extends StatefulWidget {
   @override
   _ReadTodoScreenState createState() => _ReadTodoScreenState();
 }
